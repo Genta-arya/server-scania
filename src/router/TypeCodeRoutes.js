@@ -1,8 +1,10 @@
 import express from "express";
 
 import { handlePostTypeCode, handleRenameType } from "../controller/ManageTypeCode/PostTypeCode.js";
-import upload from "../config/multer.js";
+
 import { getTypeCode } from "../controller/ManageTypeCode/GetTypeCode.js";
+
+import upload from "../config/multer.js";
 
 
 const TypeRouter = express.Router();
