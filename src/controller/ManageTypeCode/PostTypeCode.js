@@ -7,12 +7,14 @@ const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 
 export const handlePostTypeCode = async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, codes } = req.body;
 
+    // Cek jika nama 'type' tidak disediakan
     if (!name) {
       return res.status(400).json({ error: "Name is required" });
     }
 
+    // Cek jika nama 'type' sudah ada
     const checkUniqueName = await prisma.type.findFirst({
       where: {
         name: name,
@@ -23,54 +25,82 @@ export const handlePostTypeCode = async (req, res) => {
       return res.status(400).json({ error: "Type already exists" });
     }
 
-    const codes = [];
-
-    Object.keys(req.body).forEach((key) => {
-      if (key.startsWith("codes[") && key.endsWith("].code")) {
-        const index = parseInt(key.match(/\d+/)[0]);
-        const code = req.body[key];
-        const pdfFile = req.files.find(
-          (file) => file.fieldname === `codes[${index}].pdf`
-        );
-
-        if (code && pdfFile) {
-          const pdfUrl = `${BASE_URL}/dokumen/${pdfFile.filename}`;
-          codes.push({ code, pdfUrl });
-        }
-      }
-    });
-
-    if (codes.length === 0) {
+    // Pastikan 'codes' disediakan dalam request
+    if (!codes || codes.length === 0) {
       return res
         .status(400)
-        .json({ error: "At least one code with PDF is required" });
+        .json({ error: "At least one code with PDF link is required" });
     }
 
-    const checkCodeAlreay = await prisma.codeType.findMany({
+    // Validasi dan persiapkan data untuk disimpan
+    const codeData = codes.map((codeObj) => {
+      const { code, pdfUrl } = codeObj;
+
+      // Pastikan 'code' dan 'pdfUrl' disediakan untuk setiap item
+      if (!code || !pdfUrl) {
+        throw new Error("Each code must have a valid code and pdfUrl");
+      }
+
+      return { code, pdfUrl };
+    });
+
+    // Cek apakah ada code yang sudah ada di database
+    const checkCodeAlready = await prisma.codeType.findMany({
       where: {
         code: {
-          in: codes.map((code) => code.code),
+          in: codeData.map((item) => item.code),
         },
       },
     });
 
-    if (checkCodeAlreay.length > 0) {
-      return res.status(400).json({ error: "Code already exists" });
+    if (checkCodeAlready.length > 0) {
+      return res.status(400).json({ error: "One or more codes already exist" });
     }
 
+    // Simpan type baru dan kode-kodenya
     await prisma.type.create({
       data: {
         name,
         codes: {
-          create: codes.map(({ code, pdfUrl }) => ({
-            code,
-            pdfUrl,
-          })),
+          create: codeData,
         },
       },
     });
 
-    res.status(201).json({ message: "Type created succesfully" });
+    // Response sukses
+    res.status(201).json({ message: "Type created successfully" });
+  } catch (error) {
+    // Gunakan handleError untuk menangani error dan memberikan respon error
+    handleError(res, error);
+  }
+};
+
+export const addNewCode = async (req, res) => {
+  const { typeId, code, pdfUrl } = req.body;
+
+  // Validasi input
+  if (!typeId || !code || !pdfUrl) {
+    return res.status(400).json({ error: "All fields are required." });
+  }
+
+  try {
+    const existingCode = await prisma.codeType.findFirst({
+      where: { code },
+    });
+
+    if (existingCode) {
+      return res.status(400).json({ error: "Code already exists." });
+    }
+
+    const newCode = await prisma.codeType.create({
+      data: {
+        typeId,
+        code,
+        pdfUrl,
+      },
+    });
+
+    res.status(201).json(newCode);
   } catch (error) {
     handleError(res, error);
   }
@@ -84,7 +114,6 @@ export const handleRenameType = async (req, res) => {
   }
 
   try {
-    
     const checkAlreadyName = await prisma.type.findFirst({
       where: {
         name: name,
