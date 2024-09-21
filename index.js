@@ -3,6 +3,7 @@ import { createServer } from "http";
 import cors from "cors";
 import AuthRouter from "./src/router/AuthRoutes.js";
 import TypeRouter from "./src/router/TypeCodeRoutes.js";
+import FolderRouter from "./src/router/FolderRoues.js";
 
 
 const app = express();
@@ -17,7 +18,9 @@ app.use(
 );
 app.use("/api/v1", AuthRouter);
 app.use("/api/v1", TypeRouter);
+app.use("/api/v1", FolderRouter);
 app.use('/dokumen', express.static('public/dokumen'));
+
 httpServer.listen(port, () => {
   console.log("Server running on port " + port);
 });
