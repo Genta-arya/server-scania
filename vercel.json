@@ -7,7 +7,7 @@
         "config": { "maxPayload": "50mb" },
         
         
-        "buildCommand": "npm run build && prisma generate"
+        "buildCommand": "npx prisma generate"
       }
     ],
     "routes": [
