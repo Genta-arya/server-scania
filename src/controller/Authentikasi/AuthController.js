@@ -127,7 +127,7 @@ export const handleRegister = async (req, res) => {
   export const checkLogin = async (req, res) => {
     const { token } = req.body;
     if (!token) {
-      return res.status(400).json({ message: "Silahkan Login" });
+      return res.status(401).json({ message: "Silahkan Login" });
     }
     try {
       const findUser = await prisma.user.findFirst({

@@ -135,7 +135,7 @@ export const deleteFolder = async (req, res) => {
     return res.status(400).json({ error: "Id is required" });
   }
   try {
-     // delete relasi
+    // delete relasi
     await prisma.file.deleteMany({
       where: {
         folderId: parseInt(id),
@@ -146,9 +146,58 @@ export const deleteFolder = async (req, res) => {
         id: parseInt(id),
       },
     });
-   
 
     return res.status(200).json({ message: "Folder deleted successfully" });
+  } catch (error) {
+    handleError(res, error);
+  }
+};
+
+export const deleteFile = async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    return res.status(400).json({ error: "Id is required" });
+  }
+  try {
+    await prisma.file.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+    return res.status(200).json({ message: "File deleted successfully" });
+  } catch (error) {
+    handleError(res, error);
+  }
+};
+
+export const handleChangeSingleFile = async (req, res) => {
+  const { id } = req.params;
+  const { urls } = req.body;
+  if (!id) {
+    return res.status(400).json({ error: "Id is required" });
+  }
+
+  if (!urls) {
+    return res.status(400).json({ error: "Urls are required" });
+  }
+  try {
+    const checkId = await prisma.file.findFirst({
+      where: {
+        id: parseInt(id),
+      },
+    });
+    if (!checkId) {
+      return res.status(400).json({ error: "Id not found" });
+    }
+    await prisma.file.update({
+      where: {
+        id: parseInt(id),
+      },
+      data: {
+        fileUrl: urls,
+      },
+    });
+    return res.status(200).json({ message: "File updated successfully" });
   } catch (error) {
     handleError(res, error);
   }

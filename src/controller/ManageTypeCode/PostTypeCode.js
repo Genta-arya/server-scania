@@ -140,3 +140,61 @@ export const handleRenameType = async (req, res) => {
     handleError(res, error);
   }
 };
+
+export const postWiringFile = async (req, res) => {
+  const { name, urls } = req.body; // 'name' di sini diasumsikan array
+  try {
+    // Cek apakah ada file yang namanya sudah ada di database
+    const existingFiles = await prisma.wiringFile.findMany({
+      where: {
+        name: {
+          in: name, // Menggunakan operator 'in' untuk memeriksa multiple nama file
+        },
+      },
+    });
+
+    if (existingFiles.length > 0) {
+      return res
+        .status(400)
+        .json({ error: "Some files already exist", existingFiles });
+    }
+
+   
+    const newFiles = await prisma.wiringFile.createMany({
+      data: name.map((fileName, index) => ({
+        name: fileName,
+        fileUrl: urls[index], 
+      })),
+    });
+
+    return res.status(200).json({
+      message: "Files created successfully",
+      newFiles,
+    });
+  } catch (error) {
+    handleError(res, error);
+  }
+};
+
+export const getDataWiring = async (req, res) => {
+  try {
+    const files = await prisma.wiringFile.findMany();
+    return res.status(200).json({ data: files });
+  } catch (error) {
+    handleError(res, error);
+  }
+}
+
+export const deleteWiringFile = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await prisma.wiringFile.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+    return res.status(200).json({ message: "File deleted successfully" });
+  } catch (error) {
+    handleError(res, error);
+  }
+}
