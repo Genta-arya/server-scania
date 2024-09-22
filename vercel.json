@@ -4,8 +4,10 @@
       {
         "src": "./index.js",
         "use": "@vercel/node",
-        "config": { "maxPayload": "50mb" }
+        "config": { "maxPayload": "50mb" },
         
+        
+        "buildCommand": "npm run build && prisma generate"
       }
     ],
     "routes": [
