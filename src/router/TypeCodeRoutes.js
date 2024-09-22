@@ -5,10 +5,7 @@ import {
   handlePostTypeCode,
   handleRenameType,
 } from "../controller/ManageTypeCode/PostTypeCode.js";
-
 import { getTypeCode } from "../controller/ManageTypeCode/GetTypeCode.js";
-
-
 import { updatedCode } from "../controller/ManageTypeCode/updateCode.js";
 import { HandleDeleteType, handleDeleteTypeData } from "../controller/ManageTypeCode/DeleteTypeCode.js";
 
