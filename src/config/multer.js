@@ -33,10 +33,9 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Inisialisasi Multer
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter
-}).any(); // Gunakan .any() jika mengupload berbagai field
+}).any(); 
 
 export default upload;
