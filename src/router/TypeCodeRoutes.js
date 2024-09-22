@@ -8,9 +8,7 @@ import {
 import { getTypeCode } from "../controller/ManageTypeCode/GetTypeCode.js";
 import { updatedCode } from "../controller/ManageTypeCode/updateCode.js";
 import { HandleDeleteType, handleDeleteTypeData } from "../controller/ManageTypeCode/DeleteTypeCode.js";
-
 const TypeRouter = express.Router();
-
 TypeRouter.post("/type", handlePostTypeCode);
 TypeRouter.get("/type", getTypeCode);
 TypeRouter.put("/rename/type", handleRenameType);
