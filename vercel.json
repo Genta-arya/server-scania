@@ -4,8 +4,8 @@
       {
         "src": "./index.js",
         "use": "@vercel/node",
-        "config": { "maxPayload": "50mb" },
-        "command": "node index.js && npx prisma generate"
+        "config": { "maxPayload": "50mb" }
+     
         
         
        
