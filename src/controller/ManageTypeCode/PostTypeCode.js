@@ -1,5 +1,4 @@
-import path from "path";
-import fs from "fs";
+
 import prisma from "../../config/prisma.js";
 import { handleError } from "../../utils/errorHandler.js";
 
@@ -8,11 +7,13 @@ const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 export const handlePostTypeCode = async (req, res) => {
   try {
     const { name, codes } = req.body;
+    console.log(req.body);
 
     // Cek jika nama 'type' tidak disediakan
     if (!name) {
       return res.status(400).json({ error: "Name is required" });
     }
+
 
     // Cek jika nama 'type' sudah ada
     const checkUniqueName = await prisma.type.findFirst({

@@ -27,7 +27,6 @@ export const updatedCode = async (req, res) => {
         },
         data: {
           code: code,
-          
         },
       });
     } else {
@@ -44,6 +43,64 @@ export const updatedCode = async (req, res) => {
     return res.status(200).json({
       message: "Code updated successfully",
     });
+  } catch (error) {
+    handleError(res, error);
+  }
+};
+
+export const manageAbout = async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    return res.status(400).json({ error: "Id is required" });
+  }
+  const { fileUrl, content } = req.body;
+
+  if (!content) {
+    return res.status(400).json({ error: "Content is required" });
+  }
+  try {
+    const checkId = await prisma.about.findFirst({
+      where: {
+        id: parseInt(id),
+      },
+    });
+    if (!checkId) {
+      return res.status(400).json({ error: "Id not found" });
+    }
+    if (!fileUrl) {
+      await prisma.about.update({
+        where: {
+          id: parseInt(id),
+        },
+        data: {
+          content: content,
+          
+        },
+      });
+    } else {
+      await prisma.about.update({
+        where: {
+          id: parseInt(id),
+        },
+        data: {
+          content: content,
+          fileUrl: fileUrl,
+        },
+      });
+    }
+
+    return res.status(200).json({
+      message: "About updated successfully",
+    });
+  } catch (error) {
+    handleError(res, error);
+  }
+};
+
+export const getAbout = async (req, res) => {
+  try {
+    const data = await prisma.about.findMany();
+    return res.status(200).json({ data });
   } catch (error) {
     handleError(res, error);
   }
