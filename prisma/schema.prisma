@@ -63,6 +63,6 @@ model WiringFile {
 
 model About {
   id      Int    @id @default(autoincrement())
-  fileUrl String? @db.Text @default("")
-  content String? @db.Text @default("")
+  fileUrl String? @db.Text
+  content String? @db.Text
 }
